@@ -24,15 +24,11 @@
  *
  */
 
-#include <iostream>
+#ifndef CLIENT_H
+#define CLIENT_H
 
+class Client
+{
+};
 
-
-int main() {
-    
-    
-    std::cout << "Hello, World!" << std::endl;
-    
-    
-    return 0;
-}
+#endif // CLIENT_H

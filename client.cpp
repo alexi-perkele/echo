@@ -24,15 +24,17 @@
  *
  */
 
-#include <iostream>
+#include "client.h"
 
+#include <iostream>
 
 
 int main() {
     
     
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Hello, Client!" << std::endl;
     
     
     return 0;
 }
+

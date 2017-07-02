@@ -24,14 +24,13 @@
  *
  */
 
+#include "server.h"
 #include <iostream>
-
-
 
 int main() {
     
     
-    std::cout << "Hello, World!" << std::endl;
+    std::cout << "Hello, Server!" << std::endl;
     
     
     return 0;

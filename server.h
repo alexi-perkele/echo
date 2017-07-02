@@ -24,15 +24,11 @@
  *
  */
 
-#include <iostream>
+#ifndef SERVER_H
+#define SERVER_H
 
+class Server
+{
+};
 
-
-int main() {
-    
-    
-    std::cout << "Hello, World!" << std::endl;
-    
-    
-    return 0;
-}
+#endif // SERVER_H
