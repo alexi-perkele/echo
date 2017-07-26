@@ -57,7 +57,7 @@ void  Server::setProtocol(std::unique_ptr<IProtocol> protocol) {
 void Server::run() {
   std::cout << "Server runnn!!" << std::endl;
   server_protocol_->process_data();
-  //   std::cout << *server_protocol_.get();
+  std::cout << *server_protocol_;
   return;
 }
 Server::~Server() {

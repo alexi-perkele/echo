@@ -55,14 +55,15 @@ int main(int ac, char* av[]) {
     std::unique_ptr<Server> tcp_connection(new Server(port, SOCK_STREAM));
     std::unique_ptr<Server> udp_connection(new Server(port, SOCK_DGRAM));
     
-   // std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol(test));
-    SimpleProtocol sprt(test);
-    IProtocol* srv_proto = &sprt; //new SimpleProtocol(test);
-    //std::cout << sprt;
+    std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol(test));
+    
+   //SimpleProtocol* sprt = new SimpleProtocol(test);
+  //  IProtocol* srv_proto = sprt; //new SimpleProtocol(test);
 
     std::cout << *srv_proto;
- //   tcp_connection->setProtocol(std::move(srv_proto));
-  //  tcp_connection->run();
+    
+    tcp_connection->setProtocol(std::move(srv_proto));
+    tcp_connection->run();
  /*   
     if(!srv_proto->storage_empty())
     {
