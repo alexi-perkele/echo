@@ -57,21 +57,11 @@ int main(int ac, char* av[]) {
     
     std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol(test));
     
-   //SimpleProtocol* sprt = new SimpleProtocol(test);
-  //  IProtocol* srv_proto = sprt; //new SimpleProtocol(test);
-
     std::cout << *srv_proto;
     
     tcp_connection->setProtocol(std::move(srv_proto));
     tcp_connection->run();
- /*   
-    if(!srv_proto->storage_empty())
-    {
-        srv_proto->process_data(); // TODO: coredumped if data not processed
-       // std::cout << *srv_proto;
-    }
-    else std::cout << "nothing to process" << std::endl;
-   */ 
+
     std::cout << "The end!" << std::endl;
 
     return 0;
