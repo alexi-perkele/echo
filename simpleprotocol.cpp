@@ -31,11 +31,11 @@ SimpleProtocol &SimpleProtocol::operator=(SimpleProtocol &&obj) {
   }
   return *this;
 }
-
+/*
 std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) {
   return proto_obj.print(os);
 }
-
+*/
 void SimpleProtocol::process_data() {
   std::cout << "Will start processing!" << std::endl;
 
@@ -51,8 +51,6 @@ void SimpleProtocol::process_data() {
 }
 
 std::ostream& SimpleProtocol::print(std::ostream& os) const {
-  os << "Simple Protocol printing!!!" << std::endl;
-  /*
   if (!storage_empty()) {
     for (auto &n : storage_)
       os << " " << n;
@@ -65,21 +63,10 @@ std::ostream& SimpleProtocol::print(std::ostream& os) const {
   else {
     os << "nothing to process" << std::endl;
   }
-   */
+   
   return os;
 
 }
-
-void SimpleProtocol::scream() const
-{
-    std::cout << "Why!!!!!!" << std::endl;
-}
-
-void SimpleProtocol::silent() const
-{
-    std::cout << "Silence!!111" << std::endl;
-}
-
 
 bool SimpleProtocol::storage_empty() const {
   return storage_.empty() ? true : false;

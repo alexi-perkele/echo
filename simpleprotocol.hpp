@@ -17,8 +17,6 @@ class SimpleProtocol: public IProtocol {
 
   void process_data() override;
   std::ostream& print(std::ostream &os) const override;
-  void scream() const;
-  void silent() const override;
   SimpleProtocol &operator=(SimpleProtocol &&obj);
   friend std::ostream &operator<<(std::ostream &os, const IProtocol& proto_obj);
 

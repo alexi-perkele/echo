@@ -32,14 +32,11 @@
 class IProtocol {
 
  public:
-          IProtocol() {};
   virtual ~IProtocol() { };
 
   virtual void process_data() = 0;
 
   virtual std::ostream& print(std::ostream &os) const = 0;
-  
-  virtual void silent() const = 0;
 
 };
 

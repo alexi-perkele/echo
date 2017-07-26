@@ -27,9 +27,10 @@
 #include "simpleprotocol.hpp"
 #include "server.hpp"
 
-
-
-
+// TODO this is looks ugly. 
+std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) {
+  return proto_obj.print(os);
+}
 
 void usage(const std::string &usg)
 {
@@ -58,10 +59,8 @@ int main(int ac, char* av[]) {
     SimpleProtocol sprt(test);
     IProtocol* srv_proto = &sprt; //new SimpleProtocol(test);
     //std::cout << sprt;
-    sprt.scream();
-    srv_proto->silent();
+
     std::cout << *srv_proto;
- //   srv_proto->scream();
  //   tcp_connection->setProtocol(std::move(srv_proto));
   //  tcp_connection->run();
  /*   
