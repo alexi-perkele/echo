@@ -24,17 +24,46 @@
  *
  */
 
-#include "client.hpp"
 
-#include <iostream>
+#include "server.hpp"
 
+Server::Server(const unsigned int &port, const int &type) : socketFd_(socket(PF_INET, type, 0)) {
 
-int main() {
-    
-    
-    std::cout << "Hello, Client!" << std::endl;
-    
-    
-    return 0;
+  struct sockaddr_in sin;
+  /* Initialize socket structure */
+  bzero((char *) &sin, sizeof(sin));
+
+  sin.sin_addr.s_addr = INADDR_ANY;
+  sin.sin_port = htons(port);
+
+  // clear sockaddr_in to sockaddr padding buffer
+  memset(&sin.sin_zero, 0, sizeof(sin.sin_zero));
+
+  if (bind(socketFd_, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
+
+    std::stringstream msg;
+    msg << std::to_string(type) << " Binding error" << std::endl;
+    errno = EACCES;
+    perror(msg.str().c_str());
+    exit(errno);
+
+  }
+}
+
+void  Server::setProtocol(std::unique_ptr<IProtocol> protocol) {
+  server_protocol_ = std::move(protocol);
+}
+
+void Server::run() {
+  std::cout << "Server runnn!!" << std::endl;
+  server_protocol_->process_data();
+  //   std::cout << *server_protocol_.get();
+  return;
+}
+Server::~Server() {
+  if (socketFd_ > 0) {
+    close(socketFd_);
+  }
+
 }
 

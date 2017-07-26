@@ -23,15 +23,56 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+#include <stdlib.h>
+#include "simpleprotocol.hpp"
+#include "server.hpp"
 
-#include "server.h"
-#include <iostream>
 
-int main() {
+
+
+
+void usage(const std::string &usg)
+{
+    errno = EINVAL;
+    perror("Error");
+    std::cout << "Usage: \n" << usg << std::endl;
+    exit (errno);
+}
+
+int main(int ac, char* av[]) {
+
+    std::string usg = std::string(av[0]) + " <port>";
     
+     if (ac != 2) {
+      usage(usg);
+      }
+ 
+    int port = atoi(av[1]);
     
-    std::cout << "Hello, Server!" << std::endl;
+    std::string test = "92qw1e8rt4t56";
     
+    std::unique_ptr<Server> tcp_connection(new Server(port, SOCK_STREAM));
+    std::unique_ptr<Server> udp_connection(new Server(port, SOCK_DGRAM));
     
+   // std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol(test));
+    SimpleProtocol sprt(test);
+    IProtocol* srv_proto = &sprt; //new SimpleProtocol(test);
+    //std::cout << sprt;
+    sprt.scream();
+    srv_proto->silent();
+    std::cout << *srv_proto;
+ //   srv_proto->scream();
+ //   tcp_connection->setProtocol(std::move(srv_proto));
+  //  tcp_connection->run();
+ /*   
+    if(!srv_proto->storage_empty())
+    {
+        srv_proto->process_data(); // TODO: coredumped if data not processed
+       // std::cout << *srv_proto;
+    }
+    else std::cout << "nothing to process" << std::endl;
+   */ 
+    std::cout << "The end!" << std::endl;
+
     return 0;
 }

@@ -24,11 +24,52 @@
  *
  */
 
-#ifndef SERVER_H
-#define SERVER_H
+#ifndef ECHOSERVER_H
+#define ECHOSERVER_H
 
-class Server
-{
-};
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#include <sys/select.h>
+#include <unistd.h>
+#include <string.h>
+#include <string>
+#include <sstream>
+#include <iostream>
+#include <memory>
+#include <utility>
+#include "IProtocol.hpp"
 
-#endif // SERVER_H
+
+class ServerContext
+    {
+    protected:
+        std::unique_ptr<IProtocol> server_protocol_;
+    public:
+        ServerContext() {};
+        virtual ~ServerContext() {};
+//	virtual void useProtocol(void) = 0;
+        virtual void setProtocol ( std::unique_ptr<IProtocol> ) = 0;
+    private:
+        // Non copyable:
+        ServerContext ( const ServerContext& );
+        ServerContext& operator= ( const ServerContext& );
+    };
+
+// An RAII armored base class for handling sockets.
+class Server : public ServerContext
+    {
+
+    public:
+        Server ( const unsigned int& port, const int& type );
+        ~Server();
+        void setProtocol ( std::unique_ptr<IProtocol> protocol ) override;
+        void run();
+
+    private:
+        int socketFd_;
+    };
+
+
+
+#endif // ECHOSERVER_H
