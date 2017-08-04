@@ -48,7 +48,6 @@ class ServerContext
     public:
         ServerContext() {};
         virtual ~ServerContext() {};
-//	virtual void useProtocol(void) = 0;
         virtual void setProtocol ( std::unique_ptr<IProtocol> ) = 0;
     private:
         // Non copyable:
@@ -68,6 +67,10 @@ class Server : public ServerContext
 
     private:
         int socketFd_;
+        
+        // socket exists and binded to port.
+        struct sockaddr_in sin_;
+        bool ready_;
     };
 
 

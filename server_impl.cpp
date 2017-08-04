@@ -27,27 +27,27 @@
 
 #include "server.hpp"
 
-Server::Server(const unsigned int &port, const int &type) : socketFd_(socket(PF_INET, type, 0)) {
+Server::Server(const unsigned int &port, const int &type) : 
+socketFd_(socket(PF_INET, type, 0)), 
+ready_(false) {
 
-  struct sockaddr_in sin;
   /* Initialize socket structure */
-  bzero((char *) &sin, sizeof(sin));
+    bzero((char *) &sin_, sizeof( sin_ ));
 
-  sin.sin_addr.s_addr = INADDR_ANY;
-  sin.sin_port = htons(port);
+    sin_.sin_addr.s_addr = INADDR_ANY;
+    sin_.sin_port = htons(port);
 
   // clear sockaddr_in to sockaddr padding buffer
-  memset(&sin.sin_zero, 0, sizeof(sin.sin_zero));
+   memset(&sin_.sin_zero, 0, sizeof( sin_.sin_zero));
 
-  if (bind(socketFd_, (struct sockaddr *) &sin, sizeof(sin)) < 0) {
-
-    std::stringstream msg;
-    msg << std::to_string(type) << " Binding error" << std::endl;
-    errno = EACCES;
-    perror(msg.str().c_str());
-    exit(errno);
-
+   if (bind(socketFd_, (struct sockaddr *) &sin_, sizeof( sin_ )) < 0) {
+     std::stringstream msg;
+     msg << std::to_string(type) << " Binding error" << std::endl;
+     errno = EACCES;
+     perror(msg.str().c_str());
+     exit(errno);
   }
+  else ready_ = true;
 }
 
 void  Server::setProtocol(std::unique_ptr<IProtocol> protocol) {
@@ -56,8 +56,35 @@ void  Server::setProtocol(std::unique_ptr<IProtocol> protocol) {
 
 void Server::run() {
   std::cout << "Server runnn!!" << std::endl;
-  server_protocol_->process_data();
-  std::cout << *server_protocol_;
+  
+  if(!ready_) return;
+  
+  listen(socketFd_, 500);  //TODO: Mind backlog argument (max conn pending)
+  
+  char buf[64*1024];
+  int ssock;
+  unsigned int sin_len = sizeof(sin_);
+  
+  while(1)
+  {
+      ssock = accept(socketFd_, (struct sockaddr *)&sin_, &sin_len);
+      
+      if (ssock < 0) return;
+      
+      int q = read(ssock, buf, sizeof(buf));
+      
+      while (q>0) 
+      {
+          server_protocol_->process_data(buf);
+          std::cout << *server_protocol_;
+          bzero((char *) &buf, sizeof( buf ));
+          q = read(ssock, buf, sizeof(buf));
+          if (q ==0) break;
+    }
+       
+   }
+  
+  std::cout << "Shutdown server" << std::endl;
   return;
 }
 Server::~Server() {

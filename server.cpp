@@ -23,14 +23,10 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+#include <thread>
 #include <stdlib.h>
 #include "simpleprotocol.hpp"
 #include "server.hpp"
-
-// TODO this is looks ugly. 
-std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) {
-  return proto_obj.print(os);
-}
 
 void usage(const std::string &usg)
 {
@@ -50,17 +46,14 @@ int main(int ac, char* av[]) {
  
     int port = atoi(av[1]);
     
-    std::string test = "92qw1e8rt4t56";
-    
     std::unique_ptr<Server> tcp_connection(new Server(port, SOCK_STREAM));
     std::unique_ptr<Server> udp_connection(new Server(port, SOCK_DGRAM));
     
-    std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol(test));
-    
-    std::cout << *srv_proto;
+    std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol());
     
     tcp_connection->setProtocol(std::move(srv_proto));
     tcp_connection->run();
+    
 
     std::cout << "The end!" << std::endl;
 
