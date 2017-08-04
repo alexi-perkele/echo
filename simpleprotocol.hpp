@@ -9,14 +9,16 @@
 class SimpleProtocol: public IProtocol {
 
  public:
-  SimpleProtocol(const std::string &data);
+  SimpleProtocol();
 
   SimpleProtocol(SimpleProtocol &&o);
 
   ~SimpleProtocol();
 
-  void process_data() override;
+  void process_data(const std::string& data) override;
+  
   std::ostream& print(std::ostream &os) const override;
+    
   SimpleProtocol &operator=(SimpleProtocol &&obj);
   friend std::ostream &operator<<(std::ostream &os, const IProtocol& proto_obj);
 
