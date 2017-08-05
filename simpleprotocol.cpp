@@ -26,10 +26,6 @@ SimpleProtocol &SimpleProtocol::operator=(SimpleProtocol &&obj) {
   return *this;
 }
 
-std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) {
-  return proto_obj.print(os);
-}
-
 void SimpleProtocol::process_data(const std::string &data) {
   storage_.clear();
   // if nothing to process- pass

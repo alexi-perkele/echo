@@ -20,7 +20,6 @@ class SimpleProtocol: public IProtocol {
   std::ostream& print(std::ostream &os) const override;
     
   SimpleProtocol &operator=(SimpleProtocol &&obj);
-  friend std::ostream &operator<<(std::ostream &os, const IProtocol& proto_obj);
 
  private:
   int sum() const;
