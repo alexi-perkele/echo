@@ -1,5 +1,4 @@
-#include "simpleprotocol.hpp"
-#include "IProtocol.hpp"
+#include "simple_protocol.hpp"
 
 SimpleProtocol::SimpleProtocol() : sum_(0), minmax_(0, 0) {
   std::cout << "Proto! " << data_ << std::endl;
@@ -21,7 +20,6 @@ SimpleProtocol &SimpleProtocol::operator=(SimpleProtocol &&obj) {
     data_ = std::move(obj.data_);
     minmax_ = std::move(obj.minmax_);
     storage_ = std::move(obj.storage_);
-
   }
   return *this;
 }

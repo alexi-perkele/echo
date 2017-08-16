@@ -25,7 +25,7 @@
  */
 #include <thread>
 #include <stdlib.h>
-#include "simpleprotocol.hpp"
+#include "simple_protocol.hpp"
 #include "server.hpp"
 
 void usage(const std::string &usg)
@@ -46,13 +46,13 @@ int main(int ac, char* av[]) {
  
     int port = atoi(av[1]);
     
-    std::unique_ptr<Server> tcp_connection(new Server(port, SOCK_STREAM));
-    std::unique_ptr<Server> udp_connection(new Server(port, SOCK_DGRAM));
+    std::unique_ptr<Server> connection(new Server(port));
+
     
     std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol());
     
-    tcp_connection->setProtocol(std::move(srv_proto));
-    tcp_connection->run();
+    connection->setProtocol(std::move(srv_proto));
+    connection->run();
     
 
     std::cout << "The end!" << std::endl;

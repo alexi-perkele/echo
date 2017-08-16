@@ -32,6 +32,7 @@
 class IProtocol {
 
  public:
+  IProtocol() {};
   virtual ~IProtocol() { };
 
   virtual void process_data(const std::string& data) = 0;
@@ -41,6 +42,10 @@ class IProtocol {
   friend std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) {
       return proto_obj.print(os);
    };
+private:
+     // Non copyable:
+        IProtocol ( const IProtocol& );
+        IProtocol& operator= ( const IProtocol& );
 };
 
 #endif

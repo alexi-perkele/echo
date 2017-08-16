@@ -38,6 +38,7 @@
 #include <iostream>
 #include <memory>
 #include <utility>
+#include <thread>
 #include "IProtocol.hpp"
 
 
@@ -52,7 +53,7 @@ class ServerContext
     private:
         // Non copyable:
         ServerContext ( const ServerContext& );
-        ServerContext& operator= ( const ServerContext& );
+        ServerContext& operator= ( const ServerContext& );       
     };
 
 // An RAII armored base class for handling sockets.
@@ -60,17 +61,23 @@ class Server : public ServerContext
     {
 
     public:
-        Server ( const unsigned int& port, const int& type );
+        Server ( const unsigned int& port);
         ~Server();
         void setProtocol ( std::unique_ptr<IProtocol> protocol ) override;
         void run();
 
+   //     void tcp_listen();
+        void tcp_conn_handle();
+        void tcp_conn_worker();
+
     private:
-        int socketFd_;
-        
+        int tcp_socketFd_;
+        int udp_socketFd_;
         // socket exists and binded to port.
-        struct sockaddr_in sin_;
+        struct sockaddr_in tcp_sin_;
+        struct sockaddr_in udp_sin_;
         bool ready_;
+      
     };
 
 

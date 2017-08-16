@@ -25,49 +25,66 @@
  */
 
 
-#include "server.hpp"
+#include <stdlib.h>
+#include "Server.hpp"
+#include <mutex>
 
-Server::Server(const unsigned int &port, const int &type) : 
-socketFd_(socket(PF_INET, type, 0)), 
-ready_(false) {
+
+Server::Server(const unsigned int &port) :
+    //server_protocol_(nullptr),
+    tcp_socketFd_(socket(PF_INET, SOCK_STREAM, 0)),
+    udp_socketFd_(socket(PF_INET, SOCK_DGRAM, 0)),
+    ready_(false)
+{
 
   /* Initialize socket structure */
-    bzero((char *) &sin_, sizeof( sin_ ));
+    bzero((char *) &tcp_sin_, sizeof(tcp_sin_));
+    bzero((char *) &udp_sin_, sizeof(udp_sin_));
 
-    sin_.sin_addr.s_addr = INADDR_ANY;
-    sin_.sin_port = htons(port);
+    tcp_sin_.sin_addr.s_addr = INADDR_ANY;
+    tcp_sin_.sin_port = htons(port);
 
   // clear sockaddr_in to sockaddr padding buffer
-   memset(&sin_.sin_zero, 0, sizeof( sin_.sin_zero));
+   memset(&tcp_sin_.sin_zero, 0, sizeof( tcp_sin_.sin_zero));
+   memset(&udp_sin_.sin_zero, 0, sizeof( udp_sin_.sin_zero));
 
-   if (bind(socketFd_, (struct sockaddr *) &sin_, sizeof( sin_ )) < 0) {
+  int bind_tcp = bind(tcp_socketFd_, (struct sockaddr *) &tcp_sin_, sizeof(tcp_sin_));
+  int bind_udp = bind(udp_socketFd_, (struct sockaddr *) &udp_sin_, sizeof(udp_sin_));
+   if (bind_tcp && bind_udp != 0) {
      std::stringstream msg;
-     msg << std::to_string(type) << " Binding error" << std::endl;
+     msg << " Binding error" << std::endl;
      errno = EACCES;
      perror(msg.str().c_str());
      exit(errno);
   }
-  else ready_ = true;
+  else
+   {
+     std::cout << "listening port: " << port << std::endl;
+     ready_ = true;
+   }
 }
 
 void  Server::setProtocol(std::unique_ptr<IProtocol> protocol) {
-  server_protocol_ = std::move(protocol);
+  server_protocol_ = std::move(protocol);  //FIXME: // Disable copy from lvalue.
+                                           //unique_ptr(const unique_ptr&) = delete;
+                                           //unique_ptr& operator=(const unique_ptr&) = delete;
+}
+
+void foo(){
+    std::cout <<"Hello foo!" << std::endl;
 }
 
 void Server::run() {
   std::cout << "Server runnn!!" << std::endl;
   
   if(!ready_) return;
-  
-  listen(socketFd_, 500);  //TODO: Mind backlog argument (max conn pending)
-  
-  char buf[64*1024];
-  int ssock;
-  unsigned int sin_len = sizeof(sin_);
-  
+
+  std::thread t(&Server::tcp_conn_handle, this);
+   t.join();
+/*
   while(1)
   {
-      ssock = accept(socketFd_, (struct sockaddr *)&sin_, &sin_len);
+      int ssock = accept(tcp_socketFd_, (struct sockaddr *)&tcp_sin_, &sin_len);
       
       if (ssock < 0) return;
       
@@ -79,18 +96,50 @@ void Server::run() {
           std::cout << *server_protocol_;
           bzero((char *) &buf, sizeof( buf ));
           q = read(ssock, buf, sizeof(buf));
-          if (q ==0) break;
-    }
-       
+          std::cout << "ECHO: " << buf << " " << q << std::endl;
+          if (q == 0) {
+                std::cout << "recv 0 " << buf << std::endl;
+                break;
+        }
+            
+          if (strcmp(buf, "q\n") == 0){ //FIXME: this is not work
+              std::cout << "Q pressed " << buf << std::endl;
+              break;
+        } 
+      }
+     close(ssock); 
    }
-  
+   */
   std::cout << "Shutdown server" << std::endl;
-  return;
 }
-Server::~Server() {
-  if (socketFd_ > 0) {
-    close(socketFd_);
+
+
+void Server::tcp_conn_handle() {
+  listen(tcp_socketFd_, 500);  //TODO: Mind backlog argument (max conn pending)
+
+  const int buf_sz = 64*1024;
+  char buf[buf_sz];
+  int slave_sock;
+  unsigned int sin_len = sizeof(tcp_sin_);
+
+  while(1) {
+     slave_sock = accept(tcp_socketFd_, (struct sockaddr *) &tcp_sin_, &sin_len);
+    if (slave_sock <0)
+      break;
+
   }
 
+}
+
+void Server::tcp_conn_worker() {
+
+}
+
+
+Server::~Server() {
+
+  if (tcp_socketFd_ > 0) close(tcp_socketFd_);
+
+  if (udp_socketFd_ > 0) close(udp_socketFd_);
 }
 
