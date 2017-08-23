@@ -39,7 +39,9 @@
 #include <memory>
 #include <utility>
 #include <thread>
-#include "IProtocol.hpp"
+#include <vector>
+#include <stdlib.h>
+#include "iprotocol.hpp"
 
 
 class ServerContext
@@ -66,11 +68,12 @@ class Server : public ServerContext
         void setProtocol ( std::unique_ptr<IProtocol> protocol ) override;
         void run();
 
-   //     void tcp_listen();
         void tcp_conn_handle();
-        void tcp_conn_worker();
+        void tcp_conn_worker(const int& ssock);
+        void udp_worker();
 
     private:
+        const int buf_sz_ = 64*1024;  
         int tcp_socketFd_;
         int udp_socketFd_;
         // socket exists and binded to port.

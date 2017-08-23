@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "IProtocol.hpp"
+#include "iprotocol.hpp"
 
 class SimpleProtocol: public IProtocol {
 
