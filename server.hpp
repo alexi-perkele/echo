@@ -41,7 +41,10 @@
 #include <thread>
 #include <vector>
 #include <stdlib.h>
+#include <algorithm>
+#include <arpa/inet.h>
 #include "iprotocol.hpp"
+#include "thread_guard.hpp"
 
 
 class ServerContext
@@ -70,7 +73,9 @@ class Server : public ServerContext
 
         void tcp_conn_handle();
         void tcp_conn_worker(const int& ssock);
-        void udp_worker();
+        
+        void udp_handler();
+        void udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli);
 
     private:
         const int buf_sz_ = 64*1024;  

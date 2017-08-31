@@ -23,7 +23,9 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+
 #include "server.hpp"
+
 
 
 Server::Server ( const unsigned int &port ) :
@@ -38,15 +40,18 @@ Server::Server ( const unsigned int &port ) :
     bzero ( ( char * ) &udp_sin_, sizeof ( udp_sin_ ) );
 
     tcp_sin_.sin_addr.s_addr = INADDR_ANY;
-    tcp_sin_.sin_port = htons ( port );
+    udp_sin_.sin_addr.s_addr = INADDR_ANY;
+    
+    udp_sin_.sin_port = htons(port);
+    tcp_sin_.sin_port = htons (port);
 
     // clear sockaddr_in to sockaddr padding buffer
     memset ( &tcp_sin_.sin_zero, 0, sizeof ( tcp_sin_.sin_zero ) );
     memset ( &udp_sin_.sin_zero, 0, sizeof ( udp_sin_.sin_zero ) );
 
     int bind_tcp = bind ( tcp_socketFd_, ( struct sockaddr * ) &tcp_sin_, sizeof ( tcp_sin_ ) );
-    std::cout << "bind to port errno: " << errno << std::endl;
     int bind_udp = bind ( udp_socketFd_, ( struct sockaddr * ) &udp_sin_, sizeof ( udp_sin_ ) );
+    
     if ( bind_tcp && bind_udp != 0 )
         {
         std::stringstream msg;
@@ -57,7 +62,6 @@ Server::Server ( const unsigned int &port ) :
         }
     else
         {
-        std::cout << "listening port: " << port << std::endl;
         ready_ = true;
         }
     }
@@ -79,69 +83,99 @@ void Server::run()
     if ( !ready_ ) return;
 
     //TODO: Mind backlog argument (max conn pending)
-    int lstn =  listen ( tcp_socketFd_, 500 );
+    listen ( tcp_socketFd_, 500 );
     if ( errno != 0 )
         {
         perror ( "Error" );
         std::cout << "socket failed!!" << std::endl;
         return;
         }
-    std::cout << "passive tcp(listen) errno: " << lstn << std::endl;
 
-    std::thread t ( &Server::tcp_conn_handle, this );
-    t.join();
+    std::vector<std::thread> threads;
+    
+    threads.push_back(std::thread(&Server::tcp_conn_handle, this));
+    threads.push_back(std::thread(&Server::udp_handler, this));
+    
+    std::for_each(threads.begin(), threads.end(), 
+                  std::mem_fn(&std::thread::join));
+    
     std::cout << "Shutdown server" << std::endl;
     }
 
 
 void Server::tcp_conn_handle()
     {
-    std::cout << "handler run!" << std::endl;
-
     int slave_sock;
     unsigned int sin_len = sizeof ( tcp_sin_ );
 
-    while ( 1 )
+    while ( true )
         {
-        std::cout << "handler loop" << std::endl;
         slave_sock = accept ( tcp_socketFd_, ( struct sockaddr * ) &tcp_sin_, &sin_len );
-        std::cout << "accepted socket: " << slave_sock << " errno: " << errno << std::endl;
+
         if ( slave_sock < 0 ) break;
   
-        std::thread t ( &Server::tcp_conn_worker, this, slave_sock );
+        std::thread t ( &Server::tcp_conn_worker, this, std::cref(slave_sock) );
         t.detach();
 
-        std::cout << "worker finished" << std::endl;
         }
     }
 
 void Server::tcp_conn_worker ( const int& ssock )
     {
-    std::cout << "Worker! capacity: " << buf_sz_/sizeof ( char ) << std::endl;
     std::vector<char> buf ( buf_sz_/sizeof ( char ) );
-    std::cout << "buf capacity " << buf.capacity() << " size: " << buf.size() << std::endl;
-
+    
     int q = 10;
     while ( q > 1 )
         {
         q = read ( ssock, buf.data(), buf_sz_ );
-        if (q<2) break;
-        std::cout << "Worker read bytes: " << q << " errno: " << errno << std::endl;
+        if (q<2) break; //FIXME
 
         server_protocol_->process_data ( {std::begin ( buf ), std::end ( buf ) } );
         std::cout << *server_protocol_;
 
         int k = write ( ssock, buf.data(), q );
         if ( k==-1 )  break;
-        std::cout << "Bytes writen: " << k << std::endl;
         
         buf.clear();
         buf.resize ( buf_sz_/sizeof ( char ) );
-        std::cout << "buffer flushed"  << std::endl;
         }
 
     close ( ssock );
     }
+
+    
+void Server::udp_handler()
+{
+    std::cout << "udp handler" << std::endl;
+    std::vector<char> udp_buf( buf_sz_/sizeof(char) );
+    
+    std::shared_ptr<std::vector<char>> buf (new std::vector<char>(buf_sz_/sizeof(char)));
+    sockaddr_in cli_addr;
+    unsigned int cli_addrlen = sizeof(cli_addr);
+    while(true){
+        int k = recvfrom(udp_socketFd_, udp_buf.data(), buf_sz_, 0, (struct sockaddr*)&cli_addr, &cli_addrlen);
+       
+        std::thread(&Server::udp_worker, this, udp_buf, std::cref(k), cli_addr).detach();
+       
+        udp_buf.resize ( buf_sz_/sizeof ( char ) );
+    }
+    
+}
+
+    
+void Server::udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli)
+{
+     std::cout << "udp worker" << std::endl;
+     server_protocol_->process_data ( {std::begin(data), std::end(data)} );
+     std::cout << *server_protocol_;
+   //  int k = write( udp_socketFd_, data.data(), data_len );
+     
+     int k = sendto(udp_socketFd_, data.data(), data_len, 0, (struct sockaddr*)&cli, sizeof(cli));
+     if (k <= 0)
+     {
+         std::cout << "udp connection lost: " << inet_ntoa(cli.sin_addr) << std::endl;
+    }
+}
 
 
 Server::~Server()
