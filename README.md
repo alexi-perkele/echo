@@ -1,3 +1,3 @@
 # echo
 Basic client/server software. 
-Client send to server data read from terminal and recieve echo reply.
+Client sending to server data read from terminal and receive echo reply.
