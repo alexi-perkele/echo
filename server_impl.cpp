@@ -154,7 +154,8 @@ void Server::udp_handler()
     unsigned int cli_addrlen = sizeof(cli_addr);
     while(true){
         int k = recvfrom(udp_socketFd_, udp_buf.data(), buf_sz_, 0, (struct sockaddr*)&cli_addr, &cli_addrlen);
-       
+        if(k<2) continue;
+      
         std::thread(&Server::udp_worker, this, udp_buf, std::cref(k), cli_addr).detach();
        
         udp_buf.resize ( buf_sz_/sizeof ( char ) );
