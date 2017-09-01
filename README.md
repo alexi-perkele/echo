@@ -4,7 +4,7 @@ Multyprotocol echo server with trivial data processing protocol:
 2)Extract digits
 4)Output sum of digits, digits in descending order, min and max values.
 
-Server runs both TCP and UDP protocols using same port number specified via command line argument.
+Server runs both TCP and UDP using same port number for both protocols. 
 
 Building instractions:
 
