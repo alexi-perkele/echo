@@ -1,5 +1,7 @@
 #ifndef _PROTOCOL_IMPL_H
 #define _PROTOCOL_IMPL_H
+
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -13,7 +15,7 @@ class SimpleProtocol: public IProtocol {
 
   SimpleProtocol(SimpleProtocol &&o);
 
-  ~SimpleProtocol();
+  ~SimpleProtocol() {};
 
   void process_data(const std::string& data) override;
   

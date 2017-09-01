@@ -1,7 +1,4 @@
-
-
 #include "client.hpp"
-
 #include <iostream>
 
 

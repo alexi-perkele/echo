@@ -1,17 +1,10 @@
 #include "simple_protocol.hpp"
 
 SimpleProtocol::SimpleProtocol() : sum_(0), minmax_(0, 0) {
-  std::cout << "Proto! " << data_ << std::endl;
-
 }
 
 SimpleProtocol::SimpleProtocol(SimpleProtocol &&obj) :
     sum_(std::move(sum_)), data_(std::move(data_)), minmax_(std::move(minmax_)), storage_(std::move(storage_)) {
-}
-
-
-SimpleProtocol::~SimpleProtocol() {
-  std::cout << "Bye Proto!" << std::endl;
 }
 
 SimpleProtocol &SimpleProtocol::operator=(SimpleProtocol &&obj) {
@@ -31,8 +24,6 @@ void SimpleProtocol::process_data(const std::string &data) {
       std::cout << "nothing to process" << std::endl;
       return;
   }
-  std::cout << "Will start processing!" << std::endl;
-  
   // extract digits from string to storage_
   for (auto i : data) {
     if (std::isdigit(i))
@@ -40,14 +31,10 @@ void SimpleProtocol::process_data(const std::string &data) {
   }
 
   if (!storage_.empty()) {
-    std::cout << "processing started" << std::endl;
     sort_desc();
     sum_ = sum();
     minmax_ = minmax();
   }
-
-  std::cout << "looks like processing finished" << std::endl;
-
 }
 
 std::ostream& SimpleProtocol::print(std::ostream& os) const {
