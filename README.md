@@ -1,4 +1,4 @@
-Multyprotocol echo server with trivial data processing protocol:
+Linux and C++ based multyprotocol echo server with following data processing protocol:
 
 1)Expecting string of digits and letters on input(not more than 60kb). 
 2)Extract digits
