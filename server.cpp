@@ -53,9 +53,6 @@ int main(int ac, char* av[]) {
     
     connection->setProtocol(std::move(srv_proto));
     connection->run();
-    
-
-    std::cout << "The end!" << std::endl;
 
     return 0;
 }
