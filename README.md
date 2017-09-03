@@ -4,7 +4,7 @@ Linux and C++ based multyprotocol echo server with following data processing pro
 2)Extract digits
 4)Output sum of digits, digits in descending order, min and max values.
 
-Server runs both TCP and UDP using same port number for both protocols. 
+Server runs TCP and UDP using same port number for both protocols. 
 
 Building instractions:
 
