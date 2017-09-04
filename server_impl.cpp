@@ -91,10 +91,9 @@ void Server::tcp_conn_handle()
         slave_sock = accept ( tcp_socketFd_, ( struct sockaddr * ) &tcp_sin_, &sin_len );
         std::cout << "slave sock: " << slave_sock << std::endl;
         if ( slave_sock < 0 ) break;
-        
-        std::async( &Server::tcp_conn_worker, this, std::cref(slave_sock));
-    //    std::thread t ( &Server::tcp_conn_worker, this, std::cref(slave_sock) );
-    //    t.detach();
+   
+        std::thread t ( &Server::tcp_conn_worker, this, std::cref(slave_sock) );
+        t.detach();
 
         }
     }

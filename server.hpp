@@ -18,6 +18,7 @@
 #include <sstream>
 #include <iostream>
 #include <memory>
+#include <future>
 #include <utility>
 #include <thread>
 #include <vector>
@@ -51,6 +52,7 @@ class Server : public ServerContext
         ~Server();
         void setProtocol ( std::unique_ptr<IProtocol> protocol ) override;
         void run();
+        void init();
 
         void tcp_conn_handle();
         void tcp_conn_worker(const int& ssock);
@@ -59,6 +61,7 @@ class Server : public ServerContext
         void udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli);
 
     private:
+        u_int16_t port_;
         const int buf_sz_ = 64*1024;  
         int tcp_socketFd_;
         int udp_socketFd_;
