@@ -3,17 +3,12 @@
 SimpleProtocol::SimpleProtocol() : sum_(0), minmax_(0, 0) {
 }
 
-SimpleProtocol::SimpleProtocol(SimpleProtocol &&obj) :
-    sum_(std::move(sum_)), data_(std::move(data_)), minmax_(std::move(minmax_)), storage_(std::move(storage_)) {
+SimpleProtocol::SimpleProtocol(SimpleProtocol &&obj)  {
+        std::swap(*this, obj);
 }
 
-SimpleProtocol &SimpleProtocol::operator=(SimpleProtocol &&obj) {
-  if (this != &obj) {
-    sum_ = std::move(obj.sum_);
-    data_ = std::move(obj.data_);
-    minmax_ = std::move(obj.minmax_);
-    storage_ = std::move(obj.storage_);
-  }
+SimpleProtocol& SimpleProtocol::operator=(SimpleProtocol obj) {
+    std::swap(*this, obj);
   return *this;
 }
 

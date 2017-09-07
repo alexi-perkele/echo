@@ -37,10 +37,8 @@ class ServerContext
         ServerContext() {};
         virtual ~ServerContext() {};
         virtual void setProtocol ( std::unique_ptr<IProtocol> ) = 0;
-    private:
-        // Non copyable:
-        ServerContext ( const ServerContext& );
-        ServerContext& operator= ( const ServerContext& );       
+        ServerContext ( const ServerContext& ) = delete;
+        ServerContext& operator= ( const ServerContext& ) = delete;   
     };
 
 // An RAII armored base class for handling sockets.

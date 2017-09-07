@@ -12,7 +12,6 @@ Server::Server ( const unsigned int &port ) :
     
 void Server::init()
 {
-    std::cout << "init server" << std::endl;
      /* Initialize socket structure */
     bzero ( ( char * ) &tcp_sin_, sizeof ( tcp_sin_ ) );
     bzero ( ( char * ) &udp_sin_, sizeof ( udp_sin_ ) );
@@ -42,7 +41,6 @@ void Server::init()
         {
         ready_ = true;
         }
-    std::cout << "init finished" << std::endl;
 }
 
 
@@ -53,8 +51,6 @@ void  Server::setProtocol ( std::unique_ptr<IProtocol> protocol )
 
 void Server::run()
     {
-    std::cout << "Server starting" << std::endl;
-    
     Server::init();
 
     if ( !ready_ ) return;
@@ -72,7 +68,7 @@ void Server::run()
     
     threads.push_back(std::thread(&Server::tcp_conn_handle, this));
     threads.push_back(std::thread(&Server::udp_handler, this));
-    
+    std::cout << "Server ready" << std::endl;
     std::for_each(threads.begin(), threads.end(), 
                   std::mem_fn(&std::thread::join));
     
@@ -132,7 +128,7 @@ void Server::udp_handler()
     while(true){
         int k = recvfrom(udp_socketFd_, udp_buf.data(), buf_sz_, 0, (struct sockaddr*)&cli_addr, &cli_addrlen);
         if(k<2) continue;
-      
+        
         std::thread(&Server::udp_worker, this, udp_buf, std::cref(k), cli_addr).detach();
        
         udp_buf.resize ( buf_sz_ );
@@ -143,7 +139,6 @@ void Server::udp_handler()
     
 void Server::udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli)
 {
-     std::cout << "udp worker" << std::endl;
      server_protocol_->process_data ( {std::begin(data), std::end(data)} );
      std::cout << *server_protocol_;
      
@@ -157,15 +152,13 @@ void Server::udp_worker(std::vector<char> data, const int& data_len, sockaddr_in
 
 Server::~Server()
     {
-    std::cout << "Server destructor" << std::endl;
+    std::cout << "Closing connections" << std::endl;
     if ( tcp_socketFd_ > 0 )
         {
-        std::cout << "closing tcp" << std::endl;
         close ( tcp_socketFd_ );
         }
     if ( udp_socketFd_ > 0 )
         {
-        std::cout << "closing udp" << std::endl;
         close ( udp_socketFd_ );
         }
     }

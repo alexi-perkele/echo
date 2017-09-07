@@ -21,13 +21,14 @@ class SimpleProtocol: public IProtocol {
   
   std::ostream& print(std::ostream &os) const override;
     
-  SimpleProtocol &operator=(SimpleProtocol &&obj);
+  SimpleProtocol& operator=(SimpleProtocol obj);
 
  private:
   int sum() const;
   std::pair<int, int> minmax() const;
   void sort_desc();
   bool storage_empty() const;
+  
   int sum_;
   std::string data_;
   std::pair<int, int> minmax_;

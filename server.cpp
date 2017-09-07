@@ -1,8 +1,4 @@
-/*
- * 
- * 
- * 
- */
+
 #include <thread>
 #include <stdlib.h>
 #include "simple_protocol.hpp"
@@ -27,8 +23,6 @@ int main(int ac, char* av[]) {
     int port = atoi(av[1]);
     
     std::unique_ptr<Server> connection(new Server(port));
-
-    
     std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol());
     
     connection->setProtocol(std::move(srv_proto));
