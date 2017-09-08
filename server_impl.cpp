@@ -13,23 +13,9 @@ Server::Server ( const unsigned int &port ) :
     
 void Server::init()
 {
-     /* Initialize socket structure */
-    bzero ( ( char * ) &tcp_sin_, sizeof ( tcp_sin_ ) );
-    bzero ( ( char * ) &udp_sin_, sizeof ( udp_sin_ ) );
-
-    tcp_sin_.sin_addr.s_addr = INADDR_ANY;
-    udp_sin_.sin_addr.s_addr = INADDR_ANY;
-    
-    udp_sin_.sin_port = htons(port_);
-    tcp_sin_.sin_port = htons (port_);
-
-    // clear sockaddr_in to sockaddr padding buffer
-    memset ( &tcp_sin_.sin_zero, 0, sizeof ( tcp_sin_.sin_zero ) );
-    memset ( &udp_sin_.sin_zero, 0, sizeof ( udp_sin_.sin_zero ) );
-
-    int bind_tcp = bind ( tcp_socketFd_, ( struct sockaddr * ) &tcp_sin_, sizeof ( tcp_sin_ ) );
-    int bind_udp = bind ( udp_socketFd_, ( struct sockaddr * ) &udp_sin_, sizeof ( udp_sin_ ) );
-    
+     int bind_tcp = passive_socket(tcp_socketFd_, tcp_sin_);
+     int bind_udp = passive_socket(udp_socketFd_, udp_sin_);
+     
     if ( bind_tcp && bind_udp != 0 )
         {
         std::stringstream msg;
@@ -42,6 +28,24 @@ void Server::init()
         {
         ready_ = true;
         }
+}
+
+
+int Server::passive_socket(const int& socket, sockaddr_in& sock_struct)
+{
+     /* Initialize socket structure */
+    bzero ( ( char * ) &sock_struct, sizeof ( sock_struct ) );
+
+    sock_struct.sin_addr.s_addr = INADDR_ANY;
+    
+    sock_struct.sin_port = htons(port_);
+    
+    // clear sockaddr_in to fit sockaddr padding buffer
+    memset ( &sock_struct.sin_zero, 0, sizeof (sock_struct.sin_zero ));
+    
+    int ret = bind ( socket, (struct sockaddr*) &sock_struct, sizeof(sock_struct) );
+    
+    return ret;
 }
 
 
@@ -85,16 +89,15 @@ void Server::tcp_conn_handle()
     while ( true )
         {
         slave_sock = accept ( tcp_socketFd_, (struct sockaddr*) &tcp_sin_, &sin_len );
-        std::cout << "slave sock: " << slave_sock << std::endl;
         if ( slave_sock < 0 ) break;
-   
+   //TODO thread pool this:
         std::thread t ( &Server::tcp_conn_worker, this, std::cref(slave_sock) );
         t.detach();
 
         }
     }
 
-void Server::tcp_conn_worker ( const int& ssock )
+void Server::tcp_conn_worker ( const int ssock )
     {
     std::vector<char> buf ( buf_sz_ );
     
@@ -125,10 +128,10 @@ void Server::udp_handler()
     sockaddr_in cli_addr;
     unsigned int cli_addrlen = sizeof(cli_addr);
     while(true){
-        int k = recvfrom(udp_socketFd_, udp_buf.data(), buf_sz_, 0, (struct sockaddr*)&cli_addr, &cli_addrlen);
-        if(k<2) continue;
-        
-        std::thread(&Server::udp_worker, this, udp_buf, std::cref(k), cli_addr).detach();
+        int data_read = recvfrom(udp_socketFd_, udp_buf.data(), buf_sz_, 0, (struct sockaddr*)&cli_addr, &cli_addrlen);
+        if(data_read<2) continue;
+        //TODO Threadpool this:
+        std::thread(&Server::udp_worker, this, udp_buf, data_read, cli_addr).detach();
        
         udp_buf.resize ( buf_sz_ );
     }
@@ -136,7 +139,7 @@ void Server::udp_handler()
 }
 
     
-void Server::udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli)
+void Server::udp_worker(std::vector<char> data, const int data_len, sockaddr_in cli)
 {
      server_protocol_->process_data ( {std::begin(data), std::end(data)} );
      std::cout << *server_protocol_;

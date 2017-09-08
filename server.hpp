@@ -52,11 +52,12 @@ class Server : public ServerContext
         ~Server();
     private:
         void init();
+        int passive_socket(const int& socket, sockaddr_in& sock_struct);
         void tcp_conn_handle();
-        void tcp_conn_worker(const int& ssock);
+        void tcp_conn_worker(const int ssock);
         void udp_handler();
-        void udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli);
-
+        void udp_worker(std::vector<char> data, const int data_len, sockaddr_in cli);
+        
         u_int16_t port_;
         const int buf_sz_;  
         int tcp_socketFd_;
