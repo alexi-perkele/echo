@@ -36,7 +36,4 @@ class SimpleProtocol: public IProtocol {
 
 };
 
-
-
-//#include "simpleprotocol.tpp"
 #endif

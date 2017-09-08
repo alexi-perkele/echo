@@ -4,6 +4,7 @@
 
 Server::Server ( const unsigned int &port ) :
     port_(port),
+    buf_sz_(64*1024),
     tcp_socketFd_ ( socket ( PF_INET, SOCK_STREAM, 0 ) ),
     udp_socketFd_ ( socket ( PF_INET, SOCK_DGRAM, 0 ) ),
     ready_ ( false )
@@ -46,7 +47,7 @@ void Server::init()
 
 void  Server::setProtocol ( std::unique_ptr<IProtocol> protocol )
     {
-    server_protocol_ = std::move ( protocol ); //FIXME: // Disable copy from lvalue.
+    server_protocol_.reset(protocol.release());
     }
 
 void Server::run()
@@ -54,7 +55,7 @@ void Server::run()
     Server::init();
 
     if ( !ready_ ) return;
-
+    
     //TODO: Mind backlog argument (max conn pending)
     listen ( tcp_socketFd_, 500 );
     if ( errno != 0 )
@@ -78,13 +79,12 @@ void Server::run()
 
 void Server::tcp_conn_handle()
     {
-        std::cout << "tcp handle" << std::endl;
     int slave_sock;
     unsigned int sin_len = sizeof ( tcp_sin_ );
 
     while ( true )
         {
-        slave_sock = accept ( tcp_socketFd_, ( struct sockaddr * ) &tcp_sin_, &sin_len );
+        slave_sock = accept ( tcp_socketFd_, (struct sockaddr*) &tcp_sin_, &sin_len );
         std::cout << "slave sock: " << slave_sock << std::endl;
         if ( slave_sock < 0 ) break;
    
@@ -98,17 +98,16 @@ void Server::tcp_conn_worker ( const int& ssock )
     {
     std::vector<char> buf ( buf_sz_ );
     
-    int q = 10;
-    while ( q > 1 )
+    int read_msg_len = 10;
+    while ( read_msg_len > 2 )
         {
-        q = read ( ssock, buf.data(), buf_sz_ );
-        if (q<2) break; //FIXME
+        read_msg_len = read ( ssock, buf.data(), buf_sz_ );
 
         server_protocol_->process_data ( {std::begin ( buf ), std::end ( buf ) } );
         std::cout << *server_protocol_;
 
-        int k = write ( ssock, buf.data(), q );
-        if ( k==-1 )  break;
+        int send_back_len = write ( ssock, buf.data(), read_msg_len );
+        if ( send_back_len==-1 )  break;
         
         buf.clear();
         buf.resize ( buf_sz_ );
