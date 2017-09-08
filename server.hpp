@@ -47,24 +47,20 @@ class Server : public ServerContext
         
     public:
         explicit Server ( const unsigned int& port);
-        ~Server();
         void setProtocol ( std::unique_ptr<IProtocol> protocol ) override;
         void run();
+        ~Server();
+    private:
         void init();
- 
         void tcp_conn_handle();
         void tcp_conn_worker(const int& ssock);
-        
         void udp_handler();
         void udp_worker(std::vector<char> data, const int& data_len, sockaddr_in cli);
 
-   
         u_int16_t port_;
         const int buf_sz_;  
         int tcp_socketFd_;
         int udp_socketFd_;
-       // void  protocol_socket();
-        // socket exists and binded to port.
         struct sockaddr_in tcp_sin_;
         struct sockaddr_in udp_sin_;
         bool ready_;    
