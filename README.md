@@ -14,4 +14,6 @@ $cmake path/to/sources
 $make
 
 Usage:
+```bash
 $echo_srv <port>
+```
