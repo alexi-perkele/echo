@@ -3,15 +3,6 @@
 SimpleProtocol::SimpleProtocol() : sum_(0), minmax_(0, 0) {
 }
 
-SimpleProtocol::SimpleProtocol(SimpleProtocol &&obj)  {
-        std::swap(*this, obj);
-}
-
-SimpleProtocol& SimpleProtocol::operator=(SimpleProtocol obj) {
-    std::swap(*this, obj);
-  return *this;
-}
-
 void SimpleProtocol::process_data(const std::string &data) {
   storage_.clear();
   // if nothing to process- pass

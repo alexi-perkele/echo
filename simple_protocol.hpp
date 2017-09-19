@@ -13,15 +13,13 @@ class SimpleProtocol: public IProtocol {
  public:
   SimpleProtocol();
 
-  SimpleProtocol(SimpleProtocol &&o);
-
   ~SimpleProtocol() {};
 
   void process_data(const std::string& data) override;
   
   std::ostream& print(std::ostream &os) const override;
     
-  SimpleProtocol& operator=(SimpleProtocol obj);
+  
 
  private:
   int sum() const;

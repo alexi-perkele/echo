@@ -16,13 +16,13 @@ class IProtocol {
 
   virtual std::ostream& print(std::ostream& os) const = 0;
   
-  friend std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) {
-      return proto_obj.print(os);
-   };
+  friend std::ostream &operator<<(std::ostream& os, const IProtocol &proto_obj) 
+   {   return proto_obj.print(os);  };
+   
 private:
      // Non copyable:
-        IProtocol ( const IProtocol& );
-        IProtocol& operator= ( const IProtocol& );
+        IProtocol ( const IProtocol& ) = delete;
+        IProtocol& operator= ( const IProtocol& ) = delete;
 };
 
 #endif
