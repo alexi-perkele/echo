@@ -32,11 +32,11 @@
 class ServerContext
     {
     protected:
-        std::unique_ptr<IProtocol> server_protocol_;
+        IProtocol* server_protocol_;
     public:
         ServerContext() {};
         virtual ~ServerContext() {};
-        virtual void setProtocol ( std::unique_ptr<IProtocol> ) = 0;
+        virtual void setProtocol ( IProtocol* protocol) = 0;
         ServerContext ( const ServerContext& ) = delete;
         ServerContext& operator= ( const ServerContext& ) = delete;   
     };
@@ -47,7 +47,7 @@ class Server : public ServerContext
         
     public:
         explicit Server ( const unsigned int& port);
-        void setProtocol ( std::unique_ptr<IProtocol> protocol ) override;
+        void setProtocol ( IProtocol* protocol ) override;
         void run();
         ~Server();
     private:

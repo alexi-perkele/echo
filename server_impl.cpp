@@ -8,7 +8,7 @@ Server::Server ( const unsigned int &port ) :
     tcp_socketFd_ ( socket ( PF_INET, SOCK_STREAM, 0 ) ),
     udp_socketFd_ ( socket ( PF_INET, SOCK_DGRAM, 0 ) ),
     ready_ ( false )
-    {   
+    {
     }
     
 void Server::init()
@@ -49,9 +49,9 @@ int Server::passive_socket(const int& socket, sockaddr_in& sock_struct)
 }
 
 
-void  Server::setProtocol ( std::unique_ptr<IProtocol> protocol )
+void  Server::setProtocol ( IProtocol* protocol )
     {
-    server_protocol_.reset(protocol.release());
+    server_protocol_ = protocol;
     }
 
 void Server::run()

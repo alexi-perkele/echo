@@ -25,7 +25,7 @@ int main(int ac, char* av[]) {
     std::unique_ptr<Server> connection(new Server(port));
     std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol());
     
-    connection->setProtocol(std::move(srv_proto));
+    connection->setProtocol(srv_proto.get());
     connection->run();
 
     return 0;
