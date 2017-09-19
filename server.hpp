@@ -26,7 +26,6 @@
 #include <algorithm>
 #include <arpa/inet.h>
 #include "iprotocol.hpp"
-#include "thread_guard.hpp"
 
 
 class ServerContext

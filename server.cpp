@@ -19,8 +19,8 @@ int main(int ac, char* av[]) {
      if (ac != 2) {
       usage(usg);
       }
- 
-    int port = atoi(av[1]);
+
+    unsigned int port = atoi(av[1]);
     
     std::unique_ptr<Server> connection(new Server(port));
     std::unique_ptr<IProtocol> srv_proto(new SimpleProtocol());
