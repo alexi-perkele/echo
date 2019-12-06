@@ -1,7 +1,6 @@
 #ifndef _PROTOCOL_IMPL_H
 #define _PROTOCOL_IMPL_H
 
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -16,11 +15,8 @@ class SimpleProtocol: public IProtocol {
   ~SimpleProtocol() {};
 
   void process_data(const std::string& data) override;
-  
   std::ostream& print(std::ostream &os) const override;
-    
   
-
  private:
   int sum() const;
   std::pair<int, int> minmax() const;

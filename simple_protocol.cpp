@@ -11,7 +11,7 @@ void SimpleProtocol::process_data(const std::string &data) {
       return;
   }
   // extract digits from string to storage_
-  for (auto i : data) {
+  for (const auto i : data) {
     if (std::isdigit(i))
       storage_.push_back(i - '0');
   }

@@ -1,6 +1,5 @@
+#include "functional"
 #include "server.hpp"
-
-
 
 Server::Server ( const unsigned int &port ) :
     port_(port),
@@ -30,7 +29,6 @@ void Server::init()
         }
 }
 
-
 int Server::passive_socket(const int& socket, sockaddr_in& sock_struct)
 {
      /* Initialize socket structure */
@@ -47,7 +45,6 @@ int Server::passive_socket(const int& socket, sockaddr_in& sock_struct)
     
     return ret;
 }
-
 
 void  Server::setProtocol ( IProtocol* protocol )
     {
@@ -79,7 +76,6 @@ void Server::run()
     
     std::cout << "Shutdown server" << std::endl;
     }
-
 
 void Server::tcp_conn_handle()
     {
